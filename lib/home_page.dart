@@ -1,6 +1,5 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,56 +15,46 @@ class _HomePageState extends State<HomePage> {
 
   // when submit button is pressed, this method will be executed
   void _submitForm() {
-    // if all validators return true, save the input values
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      print(
-          "Username: ${_nameController.text}, User Age: ${_ageController.text}");
+    if (_formKey.currentState!.validate()) { // checks if all validators return true
+      _formKey.currentState!.save(); // saves all the input values
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Test App")),
       body: Form(
         key: _formKey,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40),
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             TextFormField(
-              // instead of textfield
               controller: _nameController,
               maxLength: 50,
               decoration: const InputDecoration(
                   label: Text("Name"),
                   contentPadding: EdgeInsets.symmetric(horizontal: 6)),
               validator: (value) {
-                if (value == null ||
-                    value.isEmpty ||
-                    value.trim().length <= 1 ||
-                    value.trim().length > 50) {
+                if (value == null || value.isEmpty || value.trim().length <= 1 || value.trim().length > 50) {
                   return 'Please enter a valid input!';
                 }
-                return null;
+                return null; // this means user input value has passed all the criterias and validator can return true
               },
               onSaved: (newValue) {
-                _nameController.text = newValue!;
+                _nameController.text = newValue!; // it will never return null because it's checked above
               },
             ),
             const SizedBox(height: 8),
             TextFormField(
               controller: _ageController,
               keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.symmetric(horizontal: 6),
                 label: Text("Age"),
               ),
               validator: (value) {
-                if (value == null ||
-                    value.isEmpty ||
-                    int.tryParse(value) == null ||
-                    int.tryParse(value)! <= 0) {
+                if (value == null || value.isEmpty || int.tryParse(value) == null || int.tryParse(value)! <= 0) {
                   return "Must be a valid, positive number!";
                 }
                 return null;
@@ -89,15 +78,18 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 40),
             Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              OutlinedButton(
-                  onPressed: () => _formKey.currentState!.reset(),
-                  child: const Text("Clear")),
-              const SizedBox(width: 8),
-              ElevatedButton(
-                  onPressed: _submitForm, child: const Text("Submit")),
+              Expanded(
+                child: OutlinedButton(
+                    onPressed: () => _formKey.currentState!.reset(),
+                    child: const Text("Clear")),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                    onPressed: _submitForm, child: const Text("Submit")),
+              ),
             ]),
             const SizedBox(height: 40),
-            
           ]),
         ),
       ),
